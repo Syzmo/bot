@@ -21,7 +21,7 @@ Direction_markup = ReplyKeyboardMarkup(
     one_time_keyboard=True
 )
 
-direction_a = KeyboardButton("BackEnd")
+direction_a = KeyboardButton("BeckEnd")
 direction_d = KeyboardButton("FullStuck")
 direction_b = KeyboardButton("FrontEnd")
 direction_u = KeyboardButton("UX UI")
