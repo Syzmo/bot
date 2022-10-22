@@ -3,7 +3,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from config import bot, dp, ADMINS
 import random
 from keyboards.client_kb import start_markup
-import time
+from database.bot_db import sql_command_random
+
 async def dice_game(message: types.Message):
     a = await bot.send_dice(message.chat.id)
     b = await bot.send_dice(message.chat.id)
@@ -114,7 +115,8 @@ async def quiz_1(message: types.Message):
         open_period=25,
         reply_markup=markup
     )
-
+async def get_random_user(message: types.Message):
+    await sql_command_random(message)
 
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(info_command, commands=['info'])
@@ -125,3 +127,4 @@ def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(pin_message, commands=['pin'])
     dp.register_message_handler(game_message, commands=['game'])
     dp.register_message_handler(dice_game, commands=['dice'])
+    dp.register_message_handler(get_random_user, commands=['dice'])
