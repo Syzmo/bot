@@ -14,10 +14,6 @@ async def echo(message: types.Message):
                 f'Не матерись {username}'
             )
 
-    # if message.text == 'dice':
-    #     a = await bot.send_dice(message.chat.id)  # , emoji='⚽️')
-    #     print(a.dice.value)
-
 
 def register_handlers_extra(dp: Dispatcher):
     dp.register_message_handler(echo)
