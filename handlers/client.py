@@ -1,11 +1,11 @@
-
-
 from aiogram import types, Dispatcher
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from config import bot, dp, ADMINS
 import random
 from keyboards.client_kb import start_markup
 from Database.bot_db import sql_command_random
+from parser.film import parser
+
 
 async def dice_game(message: types.Message):
     a = await bot.send_dice(message.chat.id)
@@ -49,6 +49,20 @@ async def start_command(message: types.Message):
                                             f'"/mem" - отправляет прикольные картирки\n'
                                             f'"/music" - отправляет рандомную музыку',
                            reply_markup=start_markup)
+
+
+
+
+async def parser_film(message: types.Message):
+    items = parser()
+    for item in items:
+        await message.answer(
+            f"{item['link']}\n\n"
+            f"{item['title']}\n"
+            f"#Y{item['year']}\n"
+            f"#{item['city']}\n"
+            f"#{item['genre']}"
+        )
 
 
 async def music(message: types.Message):
@@ -117,8 +131,11 @@ async def quiz_1(message: types.Message):
         open_period=25,
         reply_markup=markup
     )
+
+
 async def get_random_user(message: types.Message):
     await sql_command_random(message)
+
 
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(info_command, commands=['info'])
@@ -130,3 +147,4 @@ def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(game_message, commands=['game'])
     dp.register_message_handler(dice_game, commands=['dice'])
     dp.register_message_handler(get_random_user, commands=['dice'])
+    dp.register_message_handler(parser_film, commands=['film'])
