@@ -4,7 +4,6 @@ from config import bot, dp, ADMINS
 import random
 from keyboards.client_kb import start_markup
 from Database.bot_db import sql_command_random
-from parser.film import parser
 
 
 async def dice_game(message: types.Message):

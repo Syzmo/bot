@@ -1,0 +1,249 @@
+Index: handlers/client.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from aiogram import types, Dispatcher\r\nfrom aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup\r\nfrom config import bot, dp, ADMINS\r\nimport random\r\nfrom keyboards.client_kb import start_markup\r\nfrom Database.bot_db import sql_command_random\r\nfrom parser.film import parser\r\n\r\n\r\nasync def dice_game(message: types.Message):\r\n    a = await bot.send_dice(message.chat.id)\r\n    b = await bot.send_dice(message.chat.id)\r\n    if a.dice.value > b.dice.value:\r\n        await bot.send_message(message.chat.id, 'ты выиграл бота!')\r\n    elif a.dice.value < b.dice.value:\r\n        await bot.send_message(message.chat.id, 'ты проиграл бота ха-ха!')\r\n\r\n\r\nasync def game_message(message: types.Message):\r\n    if message.from_user.id in ADMINS:\r\n        data = ['\uD83C\uDFB2', '⚽️', '\uD83C\uDFB3', '\uD83C\uDFC0', '\uD83C\uDFAF', '\uD83C\uDFB0']\r\n        r = random.choice(data)\r\n        await bot.send_dice(message.chat.id, emoji=r)\r\n    else:\r\n        await bot.send_message(message.chat.id, 'У тебя не достаточно прав!')\r\n\r\n\r\nasync def pin_message(message: types.Message):\r\n    if message.reply_to_message:\r\n        await bot.pin_chat_message(message.chat.id, message.reply_to_message.message_id)\r\n    else:\r\n        await message.answer(\"Укажи что закрепить!\")\r\n\r\n\r\nasync def info_command(message: types.Message):\r\n    await bot.send_message(message.chat.id, f\"Ваше имя - {message.from_user.first_name}\\n\"\r\n                                            f\"Ваше фамилия - {message.from_user.last_name}\\n\"\r\n                                            f\"полное имя - {message.from_user.full_name}\\n\"\r\n                                            f\"На данный момент у вас язык - {message.from_user.language_code}\\n\"\r\n                                            f\"Ваше id - {message.from_user.id}\\n\")\r\n\r\n\r\nasync def start_command(message: types.Message):\r\n    await bot.send_message(message.chat.id, f\"Добро пожаловать в телеграмм бот! {message.from_user.full_name}!\\n\"\r\n                                            f'Тут есть такие команды как:\\n'\r\n                                            f'\"/game\" - рандомная встроенная мини-игра(только для админов)\\n'\r\n                                            f' \"/info\" - информаци о вас\\n'\r\n                                            f'\"/quiz\" - викторина из 4 вопроса\\n'\r\n                                            f'\"/mem\" - отправляет прикольные картирки\\n'\r\n                                            f'\"/music\" - отправляет рандомную музыку',\r\n                           reply_markup=start_markup)\r\n\r\n\r\n\r\n\r\nasync def parser_film(message: types.Message):\r\n    items = parser()\r\n    for item in items:\r\n        await message.answer(\r\n            f\"{item['link']}\\n\\n\"\r\n            f\"{item['title']}\\n\"\r\n            f\"#Y{item['year']}\\n\"\r\n            f\"#{item['city']}\\n\"\r\n            f\"#{item['genre']}\"\r\n        )\r\n\r\n\r\nasync def music(message: types.Message):\r\n    music_list = open('audio/DaBro - Мне Не Страшно.mp3', 'rb')\r\n    numbers = random.randint(1, 6)\r\n    if numbers == 1:\r\n        music_list = open('audio/Eva Rida - Лови Лови.mp3', 'rb')\r\n    if numbers == 2:\r\n        music_list = open('audio/poly-brige-shrek-igraet-na-saksofone.mp3', 'rb')\r\n    if numbers == 3:\r\n        music_list = open('audio/St Project - The Night.mp3', 'rb')\r\n    if numbers == 4:\r\n        music_list = open('audio/Песня - А если пиво чуть прохладное это фантастик_[mp3mob.net].mp3', 'rb')\r\n    if numbers == 5:\r\n        music_list = open('audio/Нкей - Толпы Кричат.mp3', 'rb')\r\n    if numbers == 6:\r\n        music_list = open('audio/miyagi-samuraj(mp3name.co).mp3', 'rb')\r\n    await bot.send_audio(message.chat.id, music_list)\r\n\r\n\r\nasync def mems(message: types.Message):\r\n    mem_photo = open(\"media/mems2.jpeg\", \"rb\")\r\n    number = random.randint(1, 8)\r\n    if number == 1:\r\n        mem_photo = open(\"media/mems1.jpeg\", \"rb\")\r\n    if number == 2:\r\n        mem_photo = open(\"media/mems.jpeg\", \"rb\")\r\n    if number == 3:\r\n        mem_photo = open('media/CatMemes_PreviewVert.jpeg', 'rb')\r\n    if number == 4:\r\n        mem_photo = open('media/mems3.jpeg', 'rb')\r\n    if number == 5:\r\n        mem_photo = open('media/mems4.jpeg', 'rb')\r\n    if number == 6:\r\n        mem_photo = open('media/mems5.jpeg', 'rb')\r\n    if number == 7:\r\n        mem_photo = open('media/mems6.jpeg', 'rb')\r\n    if number == 8:\r\n        mem_photo = open('media/mems7.jpeg', 'rb')\r\n    await bot.send_photo(message.chat.id, mem_photo)\r\n\r\n\r\nasync def quiz_1(message: types.Message):\r\n    markup = InlineKeyboardMarkup()\r\n    button_call_1 = InlineKeyboardButton(\"NEXT\", callback_data='button_call_1')\r\n    markup.add(button_call_1)\r\n\r\n    question = 'В каком году был создан Google?'\r\n    answers = [\r\n        '1998',\r\n        \"1989\",\r\n        \"1996\",\r\n        \"2001\",\r\n        \"2000\",\r\n        \"2003\"\r\n    ]\r\n\r\n    await bot.send_poll(\r\n        chat_id=message.chat.id,\r\n        question=question,\r\n        options=answers,\r\n        is_anonymous=False,\r\n        type='quiz',\r\n        correct_option_id=0,\r\n        explanation=\"Гугл о тебе всё знает!!\",\r\n        open_period=25,\r\n        reply_markup=markup\r\n    )\r\n\r\n\r\nasync def get_random_user(message: types.Message):\r\n    await sql_command_random(message)\r\n\r\n\r\ndef register_handlers_client(dp: Dispatcher):\r\n    dp.register_message_handler(info_command, commands=['info'])\r\n    dp.register_message_handler(start_command, commands=['start'])\r\n    dp.register_message_handler(music, commands=['music'])\r\n    dp.register_message_handler(mems, commands=['mem'])\r\n    dp.register_message_handler(quiz_1, commands=['quiz'])\r\n    dp.register_message_handler(pin_message, commands=['pin'])\r\n    dp.register_message_handler(game_message, commands=['game'])\r\n    dp.register_message_handler(dice_game, commands=['dice'])\r\n    dp.register_message_handler(get_random_user, commands=['dice'])\r\n    dp.register_message_handler(parser_film, commands=['film'])\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/handlers/client.py b/handlers/client.py
+--- a/handlers/client.py	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
++++ b/handlers/client.py	(date 1671799518591)
+@@ -4,7 +4,6 @@
+ import random
+ from keyboards.client_kb import start_markup
+ from Database.bot_db import sql_command_random
+-from parser.film import parser
+ 
+ 
+ async def dice_game(message: types.Message):
+Index: config.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from aiogram import Bot, Dispatcher\r\nfrom decouple import config\r\nfrom aiogram.contrib.fsm_storage.memory import MemoryStorage\r\nstorage = MemoryStorage()\r\nTOKEN = config('TOKEN')\r\nbot = Bot(TOKEN)\r\ndp = Dispatcher(bot=bot, storage=storage)\r\nADMINS = [1539786534, 5367214519, ]\r\nURL = \"68.183.214.2:5000\"\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/config.py b/config.py
+--- a/config.py	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
++++ b/config.py	(date 1671799463731)
+@@ -5,5 +5,5 @@
+ TOKEN = config('TOKEN')
+ bot = Bot(TOKEN)
+ dp = Dispatcher(bot=bot, storage=storage)
+-ADMINS = [1539786534, 5367214519, ]
++ADMINS = [1539786534, 5367214519, 681704215]
+ URL = "68.183.214.2:5000"
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import asyncio\r\n\r\nfrom aiogram.utils import executor\r\nfrom config import dp\r\nimport logging\r\nfrom handlers import client, callback, extra, admin, fsmAdminFile, notifications, inline\r\nfrom Database.bot_db import sql_create\r\n\r\n\r\nasync def on_startup(_):\r\n    asyncio.create_task(notifications.scheduler())\r\n    sql_create()\r\n\r\ninline.register_handlers_inline(dp)\r\nclient.register_handlers_client(dp)\r\ncallback.register_handlers_callback(dp)\r\nadmin.register_handlers_admin(dp)\r\nfsmAdminFile.register_handlers_fsm_anketa(dp)\r\nnotifications.register_handlers_notification(dp)\r\n\r\nextra.register_handlers_extra(dp)\r\n\r\nif __name__ == \"__main__\":\r\n    logging.basicConfig(level=logging.INFO)\r\n    executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
++++ b/main.py	(date 1671799463741)
+@@ -3,20 +3,17 @@
+ from aiogram.utils import executor
+ from config import dp
+ import logging
+-from handlers import client, callback, extra, admin, fsmAdminFile, notifications, inline
++from handlers import client, callback, extra, admin, fsmAdminFile
+ from Database.bot_db import sql_create
+ 
+ 
+ async def on_startup(_):
+-    asyncio.create_task(notifications.scheduler())
+     sql_create()
+ 
+-inline.register_handlers_inline(dp)
+ client.register_handlers_client(dp)
+ callback.register_handlers_callback(dp)
+ admin.register_handlers_admin(dp)
+ fsmAdminFile.register_handlers_fsm_anketa(dp)
+-notifications.register_handlers_notification(dp)
+ 
+ extra.register_handlers_extra(dp)
+ 
+Index: parser/film.py
+===================================================================
+diff --git a/parser/film.py b/parser/film.py
+deleted file mode 100644
+--- a/parser/film.py	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
++++ /dev/null	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
+@@ -1,45 +0,0 @@
+-import requests
+-from bs4 import BeautifulSoup as BS
+-from pprint import  pprint
+-URL = "https://rezka.ag/films/"
+-HEADERS = {
+-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+-    "User-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
+-
+-}
+-
+-
+-def get_html(url, params=''):
+-    req = requests.get(url=url, headers=HEADERS, params=params)
+-    return req
+-
+-
+-def get_data(html):
+-    soup = BS(html, "html.parser")
+-    items = soup.find_all("div", class_="b-content__inline_item")
+-    film = []
+-    for item in items:
+-        info = item.find("div", class_="b-content__inline_item-link").find('div').getText().split(', ')
+-        film.append({
+-            "title": item.find('div', class_="b-content__inline_item-link").find('a').getText(),
+-            "link": item.find('div', class_="b-content__inline_item-link").find('a').get('href'),
+-            'year': info[0],
+-            'city': info[1],
+-            'genre': info[2],
+-            # 'length': item.find('span', class_='info').getText()
+-        })
+-    return film
+-
+-
+-def parser():
+-    html = get_html(URL)
+-    if html.status_code == 200:
+-        anime = []
+-        for i in range(1, 2):
+-            html = get_html(f"{URL}page/{i}/")
+-            current_page = get_data(html.text)
+-            anime.extend(current_page)
+-        return anime
+-    else:
+-        raise Exception("Error in parser!")
+-
+Index: Dockerfile
+===================================================================
+diff --git a/Dockerfile b/Dockerfile
+deleted file mode 100644
+--- a/Dockerfile	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
++++ /dev/null	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
+@@ -1,13 +0,0 @@
+-FROM python:3.10
+-
+-EXPOSE 5007
+-
+-RUN mkdir -p /opt/services/bot/ismar_bot
+-WORKDIR /opt/services/bot/geektech-bot
+-
+-
+-COPY . /opt/services/bot/ismar_bot/
+-
+-RUN pip install -r requirements.txt
+-
+-CMD ["python", "/opt/services/bot/ismar_bot/main.py"]
+\ No newline at end of file
+Index: handlers/inline.py
+===================================================================
+diff --git a/handlers/inline.py b/handlers/inline.py
+deleted file mode 100644
+--- a/handlers/inline.py	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
++++ /dev/null	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
+@@ -1,43 +0,0 @@
+-from aiogram import types, Dispatcher
+-from youtube_search import YoutubeSearch as YT
+-
+-import hashlib
+-
+-
+-
+-def finder(text):
+-    return YT(text, max_results=10).to_dict()
+-
+-async def inline_youtube_handler(query: types.InlineQuery):
+-    text = query.query or "echo"
+-    links = finder(text)
+-    articles = [
+-        types.InlineQueryResultArticle(
+-            id=hashlib.md5(f"{link['id']}".encode()).hexdigest(),
+-            title=link['title'],
+-            url=f"https://www.youtube.com{link['url_suffix']}",
+-            thumb_url=f"{link['thumbnails'][0]}",
+-            input_message_content=types.InputMessageContent(
+-                message_text=f"Держи смотри\n\nhttps://www.youtube.com{link['url_suffix']}"
+-            )
+-        )
+-        for link in links]
+-    await query.answer(articles, cache_time=60)
+-
+-
+-async def inline_google_handler(query: types.InlineQuery):
+-    text = query.query or "echo"
+-    link = f"https://www.google.com/search?q={text}"
+-    articles = [types.InlineQueryResultArticle(
+-        id=hashlib.md5(text.encode()).hexdigest(),
+-        title="Google: ",
+-        url=link,
+-        input_message_content=types.InputMessageContent(
+-            message_text=f"Держи смотри\n\nhttps://www.google.com/search?q={text}"
+-        )
+-    )]
+-    await query.answer(articles, cache_time=60)
+-
+-
+-def register_handlers_inline(dp: Dispatcher):
+-    dp.register_inline_handler(inline_google_handler)
+Index: handlers/notifications.py
+===================================================================
+diff --git a/handlers/notifications.py b/handlers/notifications.py
+deleted file mode 100644
+--- a/handlers/notifications.py	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
++++ /dev/null	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
+@@ -1,30 +0,0 @@
+-import aioschedule
+-from aiogram import types, Dispatcher
+-from config import bot
+-import asyncio
+-
+-
+-async def get_chat_id(message: types.Message):
+-    global chat_id
+-    chat_id = message.from_user.id
+-    await message.answer("ОК!")
+-
+-
+-async def go_to_sleep():
+-    await bot.send_message(chat_id=chat_id, text="псс, как дела?)))!")
+-
+-
+-
+-
+-async def scheduler():
+-    aioschedule.every().saturday.at('15:14').do(go_to_sleep)
+-    aioschedule.every().wednesday.at('17:12').do(go_to_sleep)
+-
+-    while True:
+-        await aioschedule.run_pending()
+-        await asyncio.sleep(2)
+-
+-
+-def register_handlers_notification(dp: Dispatcher):
+-    dp.register_message_handler(get_chat_id,
+-                                lambda word: "напомни" in word.text)
+\ No newline at end of file
+Index:  docker-compose.yml
+===================================================================
+diff --git a/ docker-compose.yml b/ docker-compose.yml
+deleted file mode 100644
+--- a/ docker-compose.yml	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
++++ /dev/null	(revision 7662304f6a97d157512d94a563c9f52fb137a239)
+@@ -1,11 +0,0 @@
+-version: '3.3'
+-
+-services:
+-  bot:
+-    container_name: bot
+-    restart: always
+-    build:
+-      context: .
+-      dockerfile: Dockerfile
+-    volumes:
+-      - /opt/services/bot/ismar_bot
+\ No newline at end of file
+diff --git a/parser/__init__.py b/parser/__init__.py
+deleted file mode 100644

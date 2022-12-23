@@ -5,5 +5,5 @@ storage = MemoryStorage()
 TOKEN = config('TOKEN')
 bot = Bot(TOKEN)
 dp = Dispatcher(bot=bot, storage=storage)
-ADMINS = [1539786534, 5367214519, ]
+ADMINS = [1539786534, 5367214519, 681704215]
 URL = "68.183.214.2:5000"
